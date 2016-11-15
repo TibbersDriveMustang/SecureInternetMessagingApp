@@ -2,10 +2,14 @@ import socket
 import sys
 
 from Crypto.Cipher import AES
+from Crypto import Random
 import base64
 import os
 
 class Server:
+    #Place to store all clients hashed password
+    passwordList = {}
+
     def __init__(self):
         #Create a TCP/IP socket
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -17,6 +21,7 @@ class Server:
 
         #Listen for incoming connections
         self.socket.listen(1)
+        self.test()
 
     def start(self):
         while True:
@@ -47,5 +52,13 @@ class Server:
         BLOCK_SIZE = 16
         PADDING = '{'
         pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
+
+    def testEncryption(self):
+        key = b'Sixteen byte key'
+        iv = Random.new().read(AES.block_size)
+        cipher = AES.new(key, AES.MODE_CFB, iv)
+        msg = iv + cipher.encrypt(b'Attack at dawn')
+        print('crypted msg: ' +  msg)
 server = Server()
-server.start()
+#server.start()
+server.testEncryption()
