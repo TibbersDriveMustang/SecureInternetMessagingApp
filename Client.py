@@ -1,5 +1,7 @@
 import socket
 import sys
+import Crypto
+
 
 class Client:
     def __init__(self):

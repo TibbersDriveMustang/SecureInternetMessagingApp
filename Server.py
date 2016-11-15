@@ -1,6 +1,10 @@
 import socket
 import sys
 
+from Crypto.Cipher import AES
+import base64
+import os
+
 class Server:
     def __init__(self):
         #Create a TCP/IP socket
@@ -35,5 +39,13 @@ class Server:
             finally:
                 #Clean up the connection
                 connection.close()
+
+    def encryption(self,privateInfo):
+        #32 bytes = 256 bits
+        #16 = 128 bits
+        #the block size for cipher obj, can be 16 24 or 32. 16 matches 128 bit.
+        BLOCK_SIZE = 16
+        PADDING = '{'
+        pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
 server = Server()
 server.start()
