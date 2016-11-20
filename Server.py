@@ -21,7 +21,7 @@ class Server:
 
         #Listen for incoming connections
         self.socket.listen(1)
-        self.test()
+        self.start()
 
     def start(self):
         while True:
@@ -33,16 +33,18 @@ class Server:
 
                 #Receive the data in small chunks and retransmit it
                 while True:
-                    data =connection.recv(16)
+                    data = connection.recv(16)
                     print >> sys.stderr, 'received "%s"' % data
                     if data:
                         print >> sys.stderr, 'Sending data back to the client'
                         connection.sendall(data)
                     else:
+                        self.testEncryption()
                         print >> sys.stderr, 'no more data from', client_address
                         break
             finally:
                 #Clean up the connection
+                print >> sys.stderr, "Connection Close"
                 connection.close()
 
     def encryption(self,privateInfo):
@@ -58,7 +60,6 @@ class Server:
         iv = Random.new().read(AES.block_size)
         cipher = AES.new(key, AES.MODE_CFB, iv)
         msg = iv + cipher.encrypt(b'Attack at dawn')
-        print('crypted msg: ' +  msg)
+        print >> sys.stderr, 'Crypted Message: "%s"' % msg
+
 server = Server()
-#server.start()
-server.testEncryption()
