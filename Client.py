@@ -3,6 +3,11 @@ import sys
 import Crypto
 from Tkinter import *
 
+class commands:
+    START = '1'
+    AUTHEN = '2'
+    STOP = '3'
+
 class Client:
     def __init__(self):
         #Create a TCP/IP socket
@@ -29,8 +34,12 @@ class Client:
 
     def start(self):
         try:
-            #Send data
-            message = 'This is the message. It will be repeated.'
+            # Send command
+            command = commands.START
+            self.sock.send(command)
+
+            # Send data
+            message = 'Client Password: ' + self.password
             print >> sys.stderr, 'sending "%s"' % message
             self.sock.sendall(message)
 
@@ -48,8 +57,8 @@ class Client:
             self.sock.close()
 
     def comparePWD(self):
-        password = self.e1.get()
-        print >> sys.stderr, password
+        self.password = self.e1.get()
+        print >> sys.stderr, self.password
         self.master.quit()
         print >> sys.stderr, 'Compare Password'
 
