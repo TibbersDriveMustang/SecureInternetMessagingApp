@@ -7,6 +7,8 @@ import base64
 import os
 from Crypto.PublicKey import RSA
 from Crypto import Random
+from OpenSSL import crypto, SSL
+import pickle
 
 class commands:
     START = '1'
@@ -31,6 +33,9 @@ class Server:
         key = RSA.generate(1024,random_generator)
 
         print >> sys.stderr, 'Key Pairs Generated : ', key
+
+        #Wrtie public key to file
+        pickle.dump(key.publickey(),open("serverPublicKey","wb"))
 
         #Create a TCP/IP socket
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
