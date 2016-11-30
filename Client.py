@@ -3,13 +3,20 @@ import sys
 from Crypto.Hash import SHA256
 from Tkinter import *
 
+#public key encryption
+from Crypto.Cipher import  DES3
+from Crypto.Cipher import blockalgo
+
+
 class commands:
     START = '1'
     AUTHEN = '2'
     STOP = '3'
 
 class Client:
+    clientPassword = [11]
     def __init__(self):
+        self.serverPublicKey = 'server_public_key'
         #Create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #Password GUI
@@ -25,24 +32,44 @@ class Client:
         self.button.grid(row = 1, column = 0, padx = 2, pady = 2)
 
 
-        #Password
+        #Password Hash
         self.passwordHash = SHA256.new('hxg140630').digest()
 
-        #Connect the socket to the port where the server is listening
-        server_address = ('localhost', 10000)
-        print >> sys.stderr, 'Connecting to %s port %s' % server_address
-        self.sock.connect(server_address)
+
+
+
 
         mainloop()
 
     def start(self):
+        server_address = ('localhost', 10000)
+        print >> sys.stderr, 'Connecting to %s port %s' % server_address
+
+        #Authentication
+        key = str.encode(self.serverPublicKey)
+        iv = 0
+        cipher = DES3.new(key,blockalgo.MODE_ECB,iv)
+        cipherText = cipher.encrypt(self.clientPassword[0])
+        self.sock.connect(server_address)
+
+        #Send Authentication
+        self.sock.send(cipherText)
+        #Waiting for ack
+
+
         try:
+            # Connect the socket to the port where the server is listening
+            self.sock.connect(server_address)
+
             # Send command
             command = commands.START
             self.sock.send(command)
 
             # Send data
-            message = 'Client Session Key: ' # session key
+            #message = 'Connecting to Server' # session key
+            #Send authentication
+
+
             print >> sys.stderr, 'sending "%s"' % message
             self.sock.sendall(message)
 
@@ -69,6 +96,7 @@ class Client:
 
         if passwordHash == self.passwordHash:
             print >> sys.stderr, 'User Authenticated'
+            self.start()
         else:
             sys.exit("Password Error")
 
@@ -76,4 +104,3 @@ class Client:
 
 
 client = Client()
-client.start()

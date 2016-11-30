@@ -5,6 +5,8 @@ from Crypto.Cipher import AES
 from Crypto import Random
 import base64
 import os
+from Crypto.PublicKey import RSA
+from Crypto import Random
 
 class commands:
     START = '1'
@@ -13,9 +15,23 @@ class commands:
 
 class Server:
     #Place to store all clients hashed password
-    passwordList = {}
+    publicKey = 'server_public_key'
+    # clientID : clientPassword
+    passwordList = {'1' : '11', '2' : '12'}
+    # Store client IP Address
+    clientAddressList = {}
 
     def __init__(self):
+        #Test
+        #key = str.encode(self.publicKey)
+        #print >> sys.stderr, key.exportKey('OpenSSH')
+
+        #Generate Public/Private Key
+        random_generator = Random.new().read
+        key = RSA.generate(1024,random_generator)
+
+        print >> sys.stderr, 'Key Pairs Generated : ', key
+
         #Create a TCP/IP socket
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -37,6 +53,10 @@ class Server:
                 print >> sys.stderr, 'Connection from ', client_address
 
                 #Receive the data in small chunks and retransmit it
+                clientAuthn = connection.recv(16)
+                key = str.encode(self.publicKey)
+
+                #Receiving commands
                 command = connection.recv(16)
                 if(command == commands.START):
                     print >> sys.stderr, 'Starting'
