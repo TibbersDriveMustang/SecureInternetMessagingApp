@@ -7,6 +7,7 @@ from Tkinter import *
 from Crypto.Cipher import  DES3
 from Crypto.Cipher import blockalgo
 
+import pickle
 
 class commands:
     START = '1'
@@ -16,7 +17,6 @@ class commands:
 class Client:
     clientPassword = [11]
     def __init__(self):
-        self.serverPublicKey = 'server_public_key'
         #Create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         #Password GUI
@@ -35,21 +35,27 @@ class Client:
         #Password Hash
         self.passwordHash = SHA256.new('hxg140630').digest()
 
-
+        self.start()
 
 
 
         mainloop()
 
     def start(self):
+        #Load Server Public Key
+        self.serverPublicKey = pickle.load( open("serverPublicKey", "rb"))
+        print >> sys.stderr, 'Public Key: ', self.serverPublicKey
+        #TEST
+        cipherText = self.serverPublicKey.encrypt('TEST',32)
+
         server_address = ('localhost', 10000)
         print >> sys.stderr, 'Connecting to %s port %s' % server_address
 
         #Authentication
-        key = str.encode(self.serverPublicKey)
-        iv = 0
-        cipher = DES3.new(key,blockalgo.MODE_ECB,iv)
-        cipherText = cipher.encrypt(self.clientPassword[0])
+        #key = str.encode(self.serverPublicKey)
+        #iv = 0
+        #cipher = DES3.new(key,blockalgo.MODE_ECB,iv)
+        #cipherText = cipher.encrypt(self.clientPassword[0])
         self.sock.connect(server_address)
 
         #Send Authentication
