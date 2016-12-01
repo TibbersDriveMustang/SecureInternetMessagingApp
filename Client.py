@@ -8,6 +8,7 @@ from Crypto.Cipher import  DES3
 from Crypto.Cipher import blockalgo
 
 import pickle
+import json
 
 class commands:
     START = '1'
@@ -48,8 +49,15 @@ class Client:
         #TEST
         cipherText = self.serverPublicKey.encrypt('TEST',32)
 
+        print >> sys.stderr,'Cipher Text: ', cipherText
+
+        #Server Info
         server_address = ('localhost', 10000)
         print >> sys.stderr, 'Connecting to %s port %s' % server_address
+
+
+        #Data Serialization
+        data = pickle.dumps(cipherText, -1)
 
         #Authentication
         #key = str.encode(self.serverPublicKey)
@@ -59,14 +67,15 @@ class Client:
         self.sock.connect(server_address)
 
         #Send Authentication
-        self.sock.send(cipherText)
+        self.sock.send(data)
+        print >> sys.stderr, 'Data Sent: ', data
         #Waiting for ack
+        self.sock.close()
 
 
         try:
             # Connect the socket to the port where the server is listening
             self.sock.connect(server_address)
-
             # Send command
             command = commands.START
             self.sock.send(command)

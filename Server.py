@@ -9,6 +9,7 @@ from Crypto.PublicKey import RSA
 from Crypto import Random
 from OpenSSL import crypto, SSL
 import pickle
+import json
 
 class commands:
     START = '1'
