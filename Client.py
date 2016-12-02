@@ -77,16 +77,16 @@ class Client:
         #    load = f.read(1024)
 
 
-
         #Send Authen
         self.sock.send(data)
 
         print >> sys.stderr, 'Authentication sent to Server'
         #Waiting for ack
         temp = self.sock.recv(1024)
-        print >> sys.stderr, "peer client addr received: ", temp
         peer_client_addr = json.loads(temp)
-        #print >> sys.stderr,"peer client addre: ", peer_client_addr
+        print >> sys.stderr,"peer client address/port received: ", peer_client_addr[0], ':', peer_client_addr[1]
+
+        #Get Session Key
 
         try:
             # Send command

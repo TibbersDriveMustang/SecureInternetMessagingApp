@@ -23,8 +23,8 @@ class Server:
     passwordList = ['client1Password','client2Password']
     # Store client IP Address
     clientAddressList = {}
-    cllient_1_address = ('localhost', 10001)
-    cllient_2_address = ('localhost', 10002)
+    client_1_address = ['localhost', 10001]
+    client_2_address = ['localhost', 10002]
 
 
     def __init__(self):
@@ -69,18 +69,25 @@ class Server:
                 print >> sys.stderr, 'Received authen: ', authen
 
                 plainAuthn = self.key.decrypt(authen)
+
                 print >> sys.stderr,'Decrypted text: ', plainAuthn
 
+                #Client 1
                 if plainAuthn == self.passwordList[0]:
                     print >> sys.stderr, "Client_1 Authen Successfully"
-                    temp = json.dumps(self.cllient_2_address)
+                    temp = json.dumps(self.client_2_address)
+                    #send peer client address
                     connection.send(temp)
                     print >> sys.stderr, "Peer Client_1 Address Sent"
+                    #send session key
+                    
 
-
+                #Client 2
                 if plainAuthn == self.passwordList[1]:
                     print >> sys.stderr, "Client_2 Authen Successfully"
-
+                    tem2 = json.dumps(self.client_1_address)
+                    connection.send(tem2)
+                    print >> sys.stderr, "Peer Client_2 Address Sent"
                 #key = str.encode(self.publicKey)
 
                 #Receiving commands
