@@ -87,6 +87,8 @@ class Client:
         print >> sys.stderr,"peer client address/port received: ", peer_client_addr[0], ':', peer_client_addr[1]
 
         #Get Session Key
+        sessionKey = self.sock.recv(1024)
+        print >> sys.stderr, 'sessionkey received: ', sessionKey
 
         try:
             # Send command
