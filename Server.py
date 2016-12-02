@@ -20,11 +20,12 @@ class Server:
     #Place to store all clients hashed password
     publicKey = 'server_public_key'
     # clientID : clientPassword
-    passwordList = {'1' : '11', '2' : '12'}
+    passwordList = ['client1Password','client2Password']
     # Store client IP Address
     clientAddressList = {}
+    cllient_1_address = ('localhost', 10001)
+    cllient_2_address = ('localhost', 10002)
 
-    authenTest = 'This is a TEST message from Client'
 
     def __init__(self):
         #Test
@@ -70,8 +71,15 @@ class Server:
                 plainAuthn = self.key.decrypt(authen)
                 print >> sys.stderr,'Decrypted text: ', plainAuthn
 
-                if plainAuthn == self.authenTest:
-                    print >> sys.stderr, "Authen Successfully"
+                if plainAuthn == self.passwordList[0]:
+                    print >> sys.stderr, "Client_1 Authen Successfully"
+                    temp = json.dumps(self.cllient_2_address)
+                    connection.send(temp)
+                    print >> sys.stderr, "Peer Client_1 Address Sent"
+
+
+                if plainAuthn == self.passwordList[1]:
+                    print >> sys.stderr, "Client_2 Authen Successfully"
 
                 #key = str.encode(self.publicKey)
 

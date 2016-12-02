@@ -44,7 +44,7 @@ class Client:
         print >> sys.stderr, 'Public Key: ', self.serverPublicKey
 
         #TEST
-        cipherText = self.serverPublicKey.encrypt('This is a TEST message from Client',32)
+        cipherText = self.serverPublicKey.encrypt('client1Password',32)
 
         print >> sys.stderr,'Cipher Text: ', cipherText
 
@@ -83,6 +83,10 @@ class Client:
 
         print >> sys.stderr, 'Authentication sent to Server'
         #Waiting for ack
+        temp = self.sock.recv(1024)
+        print >> sys.stderr, "peer client addr received: ", temp
+        peer_client_addr = json.loads(temp)
+        #print >> sys.stderr,"peer client addre: ", peer_client_addr
 
         try:
             # Send command
