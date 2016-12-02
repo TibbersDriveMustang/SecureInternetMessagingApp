@@ -24,6 +24,8 @@ class Server:
     # Store client IP Address
     clientAddressList = {}
 
+    authenTest = 'This is a TEST message from Client'
+
     def __init__(self):
         #Test
         #key = str.encode(self.publicKey)
@@ -31,12 +33,12 @@ class Server:
 
         #Generate Public/Private Key
         random_generator = Random.new().read
-        key = RSA.generate(1024,random_generator)
+        self.key = RSA.generate(1024,random_generator)
 
-        print >> sys.stderr, 'Key Pairs Generated : ', key
+        print >> sys.stderr, 'Key Pairs Generated : ', self.key
 
         #Wrtie public key to file
-        pickle.dump(key.publickey(),open("serverPublicKey","wb"))
+        pickle.dump(self.key.publickey(),open("serverPublicKey","wb"))
 
         #Create a TCP/IP socket
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -58,9 +60,20 @@ class Server:
             try:
                 print >> sys.stderr, 'Connection from ', client_address
 
-                #Receive the data in small chunks and retransmit it
-                clientAuthn = connection.recv(16)
-                key = str.encode(self.publicKey)
+                #Data receive pickle packet
+                pickle_receiver = connection.recv(1024)
+
+                authen = pickle.loads(pickle_receiver)
+
+                print >> sys.stderr, 'Received authen: ', authen
+
+                plainAuthn = self.key.decrypt(authen)
+                print >> sys.stderr,'Decrypted text: ', plainAuthn
+
+                if plainAuthn == self.authenTest:
+                    print >> sys.stderr, "Authen Successfully"
+
+                #key = str.encode(self.publicKey)
 
                 #Receiving commands
                 command = connection.recv(16)

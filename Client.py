@@ -35,19 +35,16 @@ class Client:
 
         #Password Hash
         self.passwordHash = SHA256.new('hxg140630').digest()
-
         self.start()
-
-
-
         mainloop()
 
     def start(self):
         #Load Server Public Key
         self.serverPublicKey = pickle.load( open("serverPublicKey", "rb"))
         print >> sys.stderr, 'Public Key: ', self.serverPublicKey
+
         #TEST
-        cipherText = self.serverPublicKey.encrypt('TEST',32)
+        cipherText = self.serverPublicKey.encrypt('This is a TEST message from Client',32)
 
         print >> sys.stderr,'Cipher Text: ', cipherText
 
@@ -56,26 +53,38 @@ class Client:
         print >> sys.stderr, 'Connecting to %s port %s' % server_address
 
 
-        #Data Serialization
-        data = pickle.dumps(cipherText, -1)
+        #Data Serialization pickle
+        #data = pickle.dumps(cipherText, -1)
+
+        data = pickle.dumps(cipherText)
 
         #Authentication
         #key = str.encode(self.serverPublicKey)
         #iv = 0
         #cipher = DES3.new(key,blockalgo.MODE_ECB,iv)
         #cipherText = cipher.encrypt(self.clientPassword[0])
+
+        # Connect the socket to the port where the server is listening
         self.sock.connect(server_address)
 
         #Send Authentication
-        self.sock.send(data)
-        print >> sys.stderr, 'Data Sent: ', data
-        #Waiting for ack
-        self.sock.close()
+        #fileName = 'authen.file'
+        #f = open(fileName,'rb')
+        #load = f.read(1024)
+        #while(load):
+        #    self.sock.send(load)
+        #    print >> sys.stderr, 'Data Sent: ', load
+        #    load = f.read(1024)
 
+
+
+        #Send Authen
+        self.sock.send(data)
+
+        print >> sys.stderr, 'Authentication sent to Server'
+        #Waiting for ack
 
         try:
-            # Connect the socket to the port where the server is listening
-            self.sock.connect(server_address)
             # Send command
             command = commands.START
             self.sock.send(command)
