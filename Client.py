@@ -10,6 +10,10 @@ from Crypto.Cipher import blockalgo
 import pickle
 import json
 
+from Crypto.Cipher import AES
+import base64
+import os
+
 class commands:
     START = '1'
     AUTHEN = '2'
@@ -90,6 +94,9 @@ class Client:
         sessionKey = self.sock.recv(1024)
         print >> sys.stderr, 'sessionkey received: ', sessionKey
 
+        self.setED(sessionKey)
+
+
         try:
             # Send command
             command = commands.START
@@ -131,6 +138,19 @@ class Client:
             sys.exit("Password Error")
 
 #    def authentication(self):
+    def setED(self, sessionKey):
+        BLOCK_SIZE = 16
+        PADDING = '{'
+        pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
+        self.sessionKey = sessionKey
+        self.EncodeAES = lambda c, s: base64.b64encode(c.encrypt(pad(s)))
+        self.DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
+        self.cipher  = AES.new(self.sessionKey)
+        encoded = self.EncodeAES(self.cipher,'password')
+        print >> sys.stderr,'Encode: ', encoded, 'Secret: ', self.sessionKey
+        decoded = self.DecodeAES(self.cipher,encoded)
+        print >> sys.stderr,'Decode: ', decoded
+
 
 
 client = Client()
