@@ -20,7 +20,7 @@ class Server:
     #Place to store all clients hashed password
     publicKey = 'server_public_key'
     # clientID : clientPassword
-    passwordList = ['client1Password','client2Password']
+    passwordList = ['client1','client2']
     # Store client IP Address
     clientAddressList = {}
     client_1_address = ['localhost', 10001]
@@ -78,17 +78,21 @@ class Server:
                     temp = json.dumps(self.client_2_address)
                     #send peer client address
                     connection.send(temp)
-                    print >> sys.stderr, "Peer Client_1 Address Sent"
-                    #send session key
+                    #Send Session Key
                     self.sessionKeySeed = self.setSessionKeySeed()
                     connection.send(self.sessionKeySeed)
+                    print >> sys.stderr, "Peer Address And SessionKey Sent to Client 1"
 
                 #Client 2
                 if plainAuthn == self.passwordList[1]:
                     print >> sys.stderr, "Client_2 Authen Successfully"
                     temp2 = json.dumps(self.client_1_address)
                     connection.send(temp2)
-                    print >> sys.stderr, "Peer Client_2 Address Sent"
+                    # Send Session Key
+                    self.sessionKeySeed = self.setSessionKeySeed()
+                    connection.send(self.sessionKeySeed)
+                    print >> sys.stderr, "Peer Address And SessionKey Sent to Client 2"
+
                 #key = str.encode(self.publicKey)
 
                 #Receiving commands

@@ -22,7 +22,7 @@ class commands:
     STOP = '3'
 
 class Client:
-    clientPasswordList = ['client1Password','client2Password']
+    clientPasswordList = ['client1','client2']
     client_1_address = ('localhost', 10001)
     client_2_address = ('localhost', 10002)
     def __init__(self):
