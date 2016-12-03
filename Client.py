@@ -137,6 +137,7 @@ class Client:
             timeStamp2 = self.DecodeAES(self.cipher,timeStampEncoded)
             print >> sys.stderr,'Client_2 receives timeStamp',timeStamp2
 
+
         #Setup Communication
 
 #        try:
