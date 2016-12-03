@@ -66,11 +66,11 @@ class Server:
 
                 authen = pickle.loads(pickle_receiver)
 
-                print >> sys.stderr, 'Received authen: ', authen
+
 
                 plainAuthn = self.key.decrypt(authen)
 
-                print >> sys.stderr,'Decrypted text: ', plainAuthn
+                print >> sys.stderr, 'Received authen: ', authen, 'Decoded: ', plainAuthn
 
                 #Client 1
                 if plainAuthn == self.passwordList[0]:

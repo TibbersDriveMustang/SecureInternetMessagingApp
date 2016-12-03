@@ -22,7 +22,7 @@ class commands:
     STOP = '3'
 
 class Client:
-    clientPassword = [11,22]
+    clientPasswordList = ['client1Password','client2Password']
     client_1_address = ('localhost', 10001)
     client_2_address = ('localhost', 10002)
     def __init__(self):
@@ -42,8 +42,8 @@ class Client:
 
 
         #Password Hash
-        self.passwordHash1 = SHA256.new('11').digest()
-        self.passwordHash2 = SHA256.new('22').digest()
+        self.passwordHash1 = SHA256.new(self.clientPasswordList[0]).digest()
+        self.passwordHash2 = SHA256.new(self.clientPasswordList[1]).digest()
 
         self.master.mainloop()
 
@@ -53,8 +53,15 @@ class Client:
         self.serverPublicKey = pickle.load( open("serverPublicKey", "rb"))
         print >> sys.stderr, 'Public Key: ', self.serverPublicKey
 
-        #TEST
-        cipherText = self.serverPublicKey.encrypt('client1Password',32)
+        #Send Encrypted Client Password to Server
+        cipherText = None
+        try:
+            if self.ID == 1:
+                cipherText = self.serverPublicKey.encrypt(self.clientPasswordList[0],32)
+            elif self.ID == 2:
+                cipherText = self.serverPublicKey.encrypt(self.clientPasswordList[1], 32)
+        except RuntimeError:
+            print ("No Such User")
 
         print >> sys.stderr,'Cipher Text: ', cipherText
 
@@ -104,29 +111,33 @@ class Client:
 
         self.setED(sessionKeySeed)
 
-        #Set Timestamp to peer
-        timeStamp = int(time.time())
-        print >> sys.stderr, 'TimeStamp: ', timeStamp
-        encodedMsg = self.EncodeAES(self.cipher, str(timeStamp))
-        print >> sys.stderr, 'encodedMsg: ',encodedMsg
-
-        #Send Timestamp
+        #Client 1 Actions
         if self.ID == 1:
+            #Set Timestamp to peer
+            timeStamp = int(time.time())
+            print >> sys.stderr, 'TimeStamp: ', timeStamp
+            encodedTS = self.EncodeAES(self.cipher, str(timeStamp))
+            print >> sys.stderr, 'encodedMsg: ',encodedTS
+
+            #Send Timestamp
             self.udpSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.udpSock.bind(self.client_1_address)
-            self.udpSock.sendto(encodedMsg,self.client_2_address)
-        #Wait for respond
+            self.udpSock.sendto(encodedTS,self.client_2_address)
+            print >> sys.stderr, 'Client_1 UDP Data Sent: ', encodedTS
+            #Wait for respond
             data, addr = self.udpSock.recvfrom(1024)
             print >> sys.stderr, 'Client_1 UDP Data Received: ', data
 
+        #Client 2 Actions
         if self.ID == 2:
             self.udpSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.udpSock.bind(self.client_2_address)
-            data, addr = self.udpSock.recvfrom(1024)
-            print >> sys.stderr, 'Client_2 UDP Data Received: ', data
+            timeStampEncoded, addr = self.udpSock.recvfrom(1024)
+            print >> sys.stderr, 'Client_2 UDP TimeStampEncoded Received: ', timeStampEncoded
+            timeStamp2 = self.DecodeAES(self.cipher,timeStampEncoded)
+            print >> sys.stderr,'Client_2 receives timeStamp',timeStamp2
+
         #Setup Communication
-
-
 
 #        try:
             # Send command
