@@ -25,7 +25,7 @@ class Server:
     clientAddressList = {}
     client_1_address = ['localhost', 10001]
     client_2_address = ['localhost', 10002]
-
+    sessionKeyClue = None
 
     def __init__(self):
         #Test
@@ -79,8 +79,9 @@ class Server:
                     #send peer client address
                     connection.send(temp)
                     #Send Session Key
-                    self.sessionKeySeed = self.setSessionKeySeed()
-                    connection.send(self.sessionKeySeed)
+                    if self.sessionKeyClue == None:
+                        self.sessionKeyClue = self.setSessionKeySeed()
+                    connection.send(self.sessionKeyClue)
                     print >> sys.stderr, "Peer Address And SessionKey Sent to Client 1"
 
                 #Client 2
@@ -89,8 +90,9 @@ class Server:
                     temp2 = json.dumps(self.client_1_address)
                     connection.send(temp2)
                     # Send Session Key
-                    self.sessionKeySeed = self.setSessionKeySeed()
-                    connection.send(self.sessionKeySeed)
+                    if self.sessionKeyClue == None:
+                        self.sessionKeyClue = self.setSessionKeySeed()
+                    connection.send(self.sessionKeyClue)
                     print >> sys.stderr, "Peer Address And SessionKey Sent to Client 2"
 
                 #key = str.encode(self.publicKey)
