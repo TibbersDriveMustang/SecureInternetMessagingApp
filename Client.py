@@ -23,6 +23,8 @@ class commands:
 
 class Client:
     clientPassword = [11,22]
+    client_1_address = ['localhost', 10001]
+    client_2_address = ['localhost', 10002]
     def __init__(self):
         #Create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -107,7 +109,9 @@ class Client:
         print >> sys.stderr, 'encodedMsg: ',encodedMsg
 
         #Send Timestamp
-
+        if self.ID == 1:
+            self.updSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.updSock.sendto(encodedMsg,self.client_2_address)
         #Wait for respond
 
         #Setup Communication
@@ -150,11 +154,13 @@ class Client:
 
         if passwordHash == self.passwordHash1:
             print >> sys.stderr, 'User1 Authenticated'
+            self.ID = 1
             # Bind different IP/PORT
             self.sock.bind(('',10001))
             self.start()
         elif passwordHash == self.passwordHash2:
             print >> sys.stderr, 'User2 Authenticated'
+            self.ID = 2
             # Bind different IP/PORT
             self.sock.bind(('', 10002))
             self.start()
