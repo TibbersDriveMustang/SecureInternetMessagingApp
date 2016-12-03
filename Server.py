@@ -80,8 +80,8 @@ class Server:
                     connection.send(temp)
                     print >> sys.stderr, "Peer Client_1 Address Sent"
                     #send session key
-                    self.sessionKey = self.generateSessionKey()
-                    connection.send(self.sessionKey)
+                    self.sessionKeySeed = self.setSessionKeySeed()
+                    connection.send(self.sessionKeySeed)
 
                 #Client 2
                 if plainAuthn == self.passwordList[1]:
@@ -117,18 +117,9 @@ class Server:
                 connection.close()
 
 
-    def generateSessionKey(self):
+    def setSessionKeySeed(self):
         BLOCK_SIZE = 16
-        PADDING = '{'
-        pad = lambda s: s + (BLOCK_SIZE - len(s) % BLOCK_SIZE) * PADDING
         secret = os.urandom(BLOCK_SIZE)
-        EncodeAES = lambda c, s: base64.b64encode(c.encrypt(pad(s)))
-        DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
-        cipher  = AES.new(secret)
-        encoded = EncodeAES(cipher,'password')
-        print >> sys.stderr,'Encode: ', encoded, 'Secret: ', secret
-        decoded = DecodeAES(cipher,encoded)
-        print >> sys.stderr,'Decode: ', decoded
         return secret
 
     def encryption(self,privateInfo, key):

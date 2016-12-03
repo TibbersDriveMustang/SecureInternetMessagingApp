@@ -14,13 +14,15 @@ from Crypto.Cipher import AES
 import base64
 import os
 
+import time
+
 class commands:
     START = '1'
     AUTHEN = '2'
     STOP = '3'
 
 class Client:
-    clientPassword = [11]
+    clientPassword = [11,22]
     def __init__(self):
         #Create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,9 +40,11 @@ class Client:
 
 
         #Password Hash
-        self.passwordHash = SHA256.new('hxg140630').digest()
-        self.start()
+        self.passwordHash1 = SHA256.new('11').digest()
+        self.passwordHash2 = SHA256.new('22').digest()
+
         mainloop()
+
 
     def start(self):
         #Load Server Public Key
@@ -91,10 +95,23 @@ class Client:
         print >> sys.stderr,"peer client address/port received: ", peer_client_addr[0], ':', peer_client_addr[1]
 
         #Get Session Key
-        sessionKey = self.sock.recv(1024)
-        print >> sys.stderr, 'sessionkey received: ', sessionKey
+        sessionKeySeed = self.sock.recv(1024)
+        print >> sys.stderr, 'sessionkey received: ', sessionKeySeed
 
-        self.setED(sessionKey)
+        self.setED(sessionKeySeed)
+
+        #Set Timestamp to peer
+        timeStamp = int(time.time())
+        print >> sys.stderr, 'TimeStamp: ', timeStamp
+        encodedMsg = self.EncodeAES(self.cipher, str(timeStamp))
+        print >> sys.stderr, 'encodedMsg: ',encodedMsg
+
+        #Send Timestamp
+
+        #Wait for respond
+
+        #Setup Communication
+
 
 
         try:
@@ -131,8 +148,15 @@ class Client:
         self.master.quit()
         print >> sys.stderr, 'Comparing Password'
 
-        if passwordHash == self.passwordHash:
-            print >> sys.stderr, 'User Authenticated'
+        if passwordHash == self.passwordHash1:
+            print >> sys.stderr, 'User1 Authenticated'
+            # Bind different IP/PORT
+            self.sock.bind(('',10001))
+            self.start()
+        elif passwordHash == self.passwordHash2:
+            print >> sys.stderr, 'User2 Authenticated'
+            # Bind different IP/PORT
+            self.sock.bind(('', 10002))
             self.start()
         else:
             sys.exit("Password Error")
