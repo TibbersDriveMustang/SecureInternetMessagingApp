@@ -126,8 +126,15 @@ class Client:
             print >> sys.stderr, 'Client_1 UDP timeStamp Sent: ', encodedTS
             #Wait for respond
             timeStamp_incr_encoded, addr = self.udpSock.recvfrom(1024)
-            timeStamp_incr = self.DecodeAES(self.cipher, timeStamp_incr_encoded)
+            timeStamp_incr = int(self.DecodeAES(self.cipher, timeStamp_incr_encoded))
             print >> sys.stderr, 'Client_1 UDP timeStamp Received: ', timeStamp_incr
+
+            if timeStamp_incr - 1 == timeStamp:
+                print >> sys.stderr, 'Session Key Match!'
+                #
+            else:
+                print >> sys.stderr, 'Session Key Not Match! Connection Break'
+
 
 
         #Client 2 Actions
