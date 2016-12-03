@@ -92,24 +92,24 @@ class Server:
                 #key = str.encode(self.publicKey)
 
                 #Receiving commands
-                command = connection.recv(16)
-                if(command == commands.START):
-                    print >> sys.stderr, 'Starting'
+#                command = connection.recv(16)
+#                if(command == commands.START):
+#                    print >> sys.stderr, 'Starting'
 
-                info = ''
-                while True:
-                    receiver = connection.recv(16)
-                    if receiver:
-                        info += receiver
-                        print >> sys.stderr, 'received "%s"' % info
+#                info = ''
+#                while True:
+#                    receiver = connection.recv(16)
+#                    if receiver:
+#                        info += receiver
+#                        print >> sys.stderr, 'received "%s"' % info
 
                         #Send acknowledge back to clinet
-                        acknowledge = 'Password Received'
-                        connection.sendall(acknowledge)
-                    else:
-                        self.testEncryption()
-                        print >> sys.stderr, 'no more data from', client_address
-                        break
+#                        acknowledge = 'Password Received'
+#                        connection.sendall(acknowledge)
+#                    else:
+#                        self.testEncryption()
+#                        print >> sys.stderr, 'no more data from', client_address
+#                        break
 
             finally:
                 #Clean up the connection

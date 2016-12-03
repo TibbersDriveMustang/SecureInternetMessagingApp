@@ -23,8 +23,8 @@ class commands:
 
 class Client:
     clientPassword = [11,22]
-    client_1_address = ['localhost', 10001]
-    client_2_address = ['localhost', 10002]
+    client_1_address = ('localhost', 10001)
+    client_2_address = ('localhost', 10002)
     def __init__(self):
         #Create a TCP/IP socket
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -45,7 +45,7 @@ class Client:
         self.passwordHash1 = SHA256.new('11').digest()
         self.passwordHash2 = SHA256.new('22').digest()
 
-        mainloop()
+        self.master.mainloop()
 
 
     def start(self):
@@ -100,6 +100,8 @@ class Client:
         sessionKeySeed = self.sock.recv(1024)
         print >> sys.stderr, 'sessionkey received: ', sessionKeySeed
 
+        self.sock.close()
+
         self.setED(sessionKeySeed)
 
         #Set Timestamp to peer
@@ -110,46 +112,54 @@ class Client:
 
         #Send Timestamp
         if self.ID == 1:
-            self.updSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self.updSock.sendto(encodedMsg,self.client_2_address)
+            self.udpSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.udpSock.bind(self.client_1_address)
+            self.udpSock.sendto(encodedMsg,self.client_2_address)
         #Wait for respond
+            data, addr = self.udpSock.recvfrom(1024)
+            print >> sys.stderr, 'Client_1 UDP Data Received: ', data
 
+        if self.ID == 2:
+            self.udpSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+            self.udpSock.bind(self.client_2_address)
+            data, addr = self.udpSock.recvfrom(1024)
+            print >> sys.stderr, 'Client_2 UDP Data Received: ', data
         #Setup Communication
 
 
 
-        try:
+#        try:
             # Send command
-            command = commands.START
-            self.sock.send(command)
+#            command = commands.START
+#            self.sock.send(command)
 
             # Send data
             #message = 'Connecting to Server' # session key
             #Send authentication
 
 
-            print >> sys.stderr, 'sending "%s"' % message
-            self.sock.sendall(message)
+#            print >> sys.stderr, 'sending "%s"' % message
+#            self.sock.sendall(message)
 
             #Look for the response
-            amount_received = 0
-            amount_expected = len(message)
-            receiver = ''
-            while amount_received < amount_expected:
-                data = self.sock.recv(16)
-                receiver += data
-                amount_received += len(data)
+#            amount_received = 0
+#            amount_expected = len(message)
+#            receiver = ''
+#            while amount_received < amount_expected:
+#                data = self.sock.recv(16)
+#                receiver += data
+#                amount_received += len(data)
 
-            print >> sys.stderr, 'received "%s"' % data
+#            print >> sys.stderr, 'received "%s"' % data
 
-        finally:
-            print >> sys.stderr, 'closing socket'
-            self.sock.close()
+#        finally:
+#            print >> sys.stderr, 'closing socket'
+#            self.sock.close()
 
     def comparePWD(self):
         password = self.e1.get()
+        self.master.destroy()
         passwordHash = SHA256.new(password).digest()
-        self.master.quit()
         print >> sys.stderr, 'Comparing Password'
 
         if passwordHash == self.passwordHash1:
