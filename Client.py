@@ -123,10 +123,12 @@ class Client:
             self.udpSock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             self.udpSock.bind(self.client_1_address)
             self.udpSock.sendto(encodedTS,self.client_2_address)
-            print >> sys.stderr, 'Client_1 UDP Data Sent: ', encodedTS
+            print >> sys.stderr, 'Client_1 UDP timeStamp Sent: ', encodedTS
             #Wait for respond
-            data, addr = self.udpSock.recvfrom(1024)
-            print >> sys.stderr, 'Client_1 UDP Data Received: ', data
+            timeStamp_incr_encoded, addr = self.udpSock.recvfrom(1024)
+            timeStamp_incr = self.DecodeAES(self.cipher, timeStamp_incr_encoded)
+            print >> sys.stderr, 'Client_1 UDP timeStamp Received: ', timeStamp_incr
+
 
         #Client 2 Actions
         if self.ID == 2:
@@ -136,6 +138,12 @@ class Client:
             print >> sys.stderr, 'Client_2 UDP TimeStampEncoded Received: ', timeStampEncoded
             timeStamp2 = self.DecodeAES(self.cipher,timeStampEncoded)
             print >> sys.stderr,'Client_2 receives timeStamp',timeStamp2
+            #Increase timeStamp by 1
+            tempNum = int(timeStamp2)
+            tempNum += 1
+            encodedTS = self.EncodeAES(self.cipher, str(tempNum))
+            self.udpSock.sendto(encodedTS,self.client_1_address)
+            print >> sys.stderr, 'Client_2 UDP timeStamp + 1 Sent: ', encodedTS
 
 
         #Setup Communication
