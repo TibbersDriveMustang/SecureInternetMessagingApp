@@ -1,4 +1,3 @@
-import socket
 import sys
 from Crypto.Hash import SHA256
 from Tkinter import *
@@ -15,6 +14,7 @@ import base64
 import os
 
 import time
+import socket
 
 class commands:
     START = '1'
@@ -132,8 +132,20 @@ class Client:
             if timeStamp_incr - 1 == timeStamp:
                 print >> sys.stderr, 'Session Key Match!'
                 #
+                client1Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                client1Socket.connect(self.client_2_address)
+                print >> sys.stderr, "Peer Connection Setup"
+                while True:
+                    print >> sys.stderr, "Input:"
+                    inputData = raw_input()
+                    inputDataEncrypted = self.EncodeAES(self.cipher,inputData)
+                    client1Socket.send(inputDataEncrypted)
+                    print >> sys.stderr, "Data Sent"
+                    receivedDataEncrypted = client1Socket.recv(1024)
+
             else:
                 print >> sys.stderr, 'Session Key Not Match! Connection Break'
+
 
 
 
@@ -152,8 +164,19 @@ class Client:
             self.udpSock.sendto(encodedTS,self.client_1_address)
             print >> sys.stderr, 'Client_2 UDP timeStamp + 1 Sent: ', encodedTS
 
+            client2Socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            client2Socket.bind(self.client_2_address)
+            client2Socket.listen(1)
+            connection, peerAddress = client2Socket.accept()
+            print >> sys.stderr, "Peer Connection Setup"
+            while True:
+                tempDataEncrypted = connection.recv(1024)
+                tempData = self.DecodeAES(self.cipher,tempDataEncrypted)
+                print >> sys.stderr, "Data Received: ", tempData
+                tempData2 = raw_input()
+                connection.send(tempData2)
 
-        #Setup Communication
+         #Setup Communication
 
 #        try:
             # Send command
