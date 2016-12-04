@@ -203,7 +203,6 @@ class Client:
         else:
             sys.exit("Password Error")
 
-#    def authentication(self):
     def setED(self, sessionKey):
         BLOCK_SIZE = 16
         PADDING = '{'

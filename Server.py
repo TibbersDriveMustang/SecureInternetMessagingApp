@@ -22,7 +22,6 @@ class Server:
     # clientID : clientPassword
     passwordList = ['client1','client2']
     # Store client IP Address
-    clientAddressList = {}
     client_1_address = ['localhost', 10001]
     client_2_address = ['localhost', 10002]
     sessionKeyClue = None
@@ -66,8 +65,6 @@ class Server:
 
                 authen = pickle.loads(pickle_receiver)
 
-
-
                 plainAuthn = self.key.decrypt(authen)
 
                 print >> sys.stderr, 'Received authen: ', authen, 'Decoded: ', plainAuthn
@@ -94,28 +91,6 @@ class Server:
                         self.sessionKeyClue = self.setSessionKeySeed()
                     connection.send(self.sessionKeyClue)
                     print >> sys.stderr, "Peer Address And SessionKey Sent to Client 2"
-
-                #key = str.encode(self.publicKey)
-
-                #Receiving commands
-#                command = connection.recv(16)
-#                if(command == commands.START):
-#                    print >> sys.stderr, 'Starting'
-
-#                info = ''
-#                while True:
-#                    receiver = connection.recv(16)
-#                    if receiver:
-#                        info += receiver
-#                        print >> sys.stderr, 'received "%s"' % info
-
-                        #Send acknowledge back to clinet
-#                        acknowledge = 'Password Received'
-#                        connection.sendall(acknowledge)
-#                    else:
-#                        self.testEncryption()
-#                        print >> sys.stderr, 'no more data from', client_address
-#                        break
 
             finally:
                 #Clean up the connection
