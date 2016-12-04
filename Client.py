@@ -142,6 +142,8 @@ class Client:
                     client1Socket.send(inputDataEncrypted)
                     print >> sys.stderr, "Data Sent"
                     receivedDataEncrypted = client1Socket.recv(1024)
+                    receivedData = self.DecodeAES(self.cipher,receivedDataEncrypted)
+                    print >> sys.stderr, "Data Received", receivedData
 
             else:
                 print >> sys.stderr, 'Session Key Not Match! Connection Break'
@@ -173,38 +175,12 @@ class Client:
                 tempDataEncrypted = connection.recv(1024)
                 tempData = self.DecodeAES(self.cipher,tempDataEncrypted)
                 print >> sys.stderr, "Data Received: ", tempData
+                print >> sys.stderr, "Input:"
                 tempData2 = raw_input()
-                connection.send(tempData2)
+                tempData2Encrypted = self.EncodeAES(self.cipher,tempData2)
+                connection.send(tempData2Encrypted)
+                print >> sys.stderr, "Data Sent"
 
-         #Setup Communication
-
-#        try:
-            # Send command
-#            command = commands.START
-#            self.sock.send(command)
-
-            # Send data
-            #message = 'Connecting to Server' # session key
-            #Send authentication
-
-
-#            print >> sys.stderr, 'sending "%s"' % message
-#            self.sock.sendall(message)
-
-            #Look for the response
-#            amount_received = 0
-#            amount_expected = len(message)
-#            receiver = ''
-#            while amount_received < amount_expected:
-#                data = self.sock.recv(16)
-#                receiver += data
-#                amount_received += len(data)
-
-#            print >> sys.stderr, 'received "%s"' % data
-
-#        finally:
-#            print >> sys.stderr, 'closing socket'
-#            self.sock.close()
 
     def comparePWD(self):
         password = self.e1.get()
